@@ -11,7 +11,7 @@ void close_lexer_token(lexer_token **lex, unsigned int len) {
   free(lex);
 }
 
-unsigned int str_to_token(char* str) {
+static unsigned int str_to_token(char* str) {
   unsigned int retval = LEX_TOK_OTHER;
 
   if (strcmp(str, "section") == 0)

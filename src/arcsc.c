@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <pthread.h>
 #include "cmdline.h"
 #include "parser/lexer.h"
+#include "runtime/glob_var.h"
 
 char* load_file_mem(char* name) {
   FILE* fp = fopen(name, "rb");
@@ -30,6 +32,8 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
+  glob_vars_init();
+
   bool can_file = false;
   for (uint16_t i = 0; i < args_len; i++) {
     if (args[i]->value == CMD_VALUE_FILE) {
@@ -37,7 +41,7 @@ int main(int argc, char** argv) {
       char* file_buf = load_file_mem(args[i]->str);
       if (file_buf == NULL) {
         fprintf(stderr, "[ERR] Unable to read file %s\n", args[i]->str);
-        /*return EXIT_FAILURE;*/ continue;
+        return EXIT_FAILURE; /* continue; */
       }
 
       unsigned int lex_tokens_len = 0;
@@ -55,5 +59,6 @@ int main(int argc, char** argv) {
   }
 
   close_args(args, &args_len);
+  close_glob_vars();
   return EXIT_SUCCESS;
 }
