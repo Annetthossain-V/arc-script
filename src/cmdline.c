@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "cmdline.h"
 
 void close_args(cmdline_value **args, uint16_t* len) {
@@ -30,4 +31,12 @@ cmdline_value** handle_args(int argc, char** argv, uint16_t* len) {
   }
 
   return args;
+}
+
+bool cmdline_contains(cmdline_value** args, uint16_t len, int value) {
+  for (uint16_t i = 0; i < len; i++) {
+    if (args[i]->value == value)
+      return true;
+  }
+  return false;
 }
