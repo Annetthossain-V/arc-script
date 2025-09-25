@@ -7,23 +7,35 @@ void close_lexer_token(lexer_token **lex, unsigned int len) {
   for (int i = 0; i < len; i++) {
     if (lex[i]->data != NULL)
       free(lex[i]->data);
+    free(lex[i]);
   }
   free(lex);
 }
 
-static unsigned int str_to_token(char* str) {
-  unsigned int retval = LEX_TOK_OTHER;
+#define CHECK_TOK_MACRO(a, b, c, d)  \
+  if (strcmp(a, b) == 0)             \
+    c = d
 
-  if (strcmp(str, "section") == 0)
-    retval = LEX_TOK_SECTION;
-  else if (strcmp(str, "func") == 0)
-    retval = LEX_TOK_FUNC;
+static unsigned int str_to_token(char* str) {
+  unsigned int retval = TOK_UNKNOWN;
+
+  // Problem! doesn't return after finding token
+  // making it check for every token
+  // slowing it down
+  // also we could just do str[0] == instead
+  CHECK_TOK_MACRO(str, "]", retval, TOK_SQUARE_BRACKET_OPEN);
+  CHECK_TOK_MACRO(str, "[", retval, TOK_SQUARE_BRACKET_CLOSE);
+  CHECK_TOK_MACRO(str, "{", retval, TOK_CURLY_BRACKETS_OPEN);
+  CHECK_TOK_MACRO(str, "}", retval, TOK_CURLY_BRACKETS_CLOSE);
+  CHECK_TOK_MACRO(str, "(", retval, TOK_BRACKETS_OPEN);
+  CHECK_TOK_MACRO(str, ")", retval, TOK_BRACKETS_CLOSE);
+  CHECK_TOK_MACRO(str, "$", retval, TOK_DOLLAR_SIGN);
 
   return retval;
 }
 
 lexer_token** lex_tokenize_str(const char* str, unsigned int* len) {
-  char* delims = " []{}()$@:*&-+<>";
+  char* delims = " []{}()$@:;*&-+<>";
   size_t tokens_str_len = 0;
   char** tokens_str = tokenize_str_raw(str, delims, &tokens_str_len);
 

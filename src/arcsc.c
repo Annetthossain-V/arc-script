@@ -6,7 +6,7 @@
 #include <pthread.h>
 #include "cmdline.h"
 #include "parser/lexer.h"
-#include "runtime/glob_var.h"
+#include "runtime/global.h"
 
 char* load_file_mem(char* name) {
   FILE* fp = fopen(name, "rb");
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     return EXIT_FAILURE;
   }
 
-  glob_vars_init();
+  runtime_global_init();
 
   bool can_file = false;
   for (uint16_t i = 0; i < args_len; i++) {
@@ -59,6 +59,6 @@ int main(int argc, char** argv) {
   }
 
   close_args(args, &args_len);
-  close_glob_vars();
+  runtime_global_deinit();
   return EXIT_SUCCESS;
 }
