@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
       unsigned int lex_tokens_len = 0;
       lexer_token** lex_tokens = lex_tokenize_str(file_buf, &lex_tokens_len);
 
+      close_lexer_token(lex_tokens, lex_tokens_len);
       free(file_buf);
     }
   }

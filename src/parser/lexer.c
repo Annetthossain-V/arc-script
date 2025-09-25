@@ -30,6 +30,15 @@ static unsigned int str_to_token(char* str) {
   CHECK_TOK_MACRO(str, "(", retval, TOK_BRACKETS_OPEN);
   CHECK_TOK_MACRO(str, ")", retval, TOK_BRACKETS_CLOSE);
   CHECK_TOK_MACRO(str, "$", retval, TOK_DOLLAR_SIGN);
+  CHECK_TOK_MACRO(str, "@", retval, TOK_ADD_SYMBOL);
+  CHECK_TOK_MACRO(str, ":", retval, TOK_COLON);
+  CHECK_TOK_MACRO(str, ";", retval, TOK_SEMI_COLON);
+  CHECK_TOK_MACRO(str, "*", retval, TOK_ASTERISK);
+  CHECK_TOK_MACRO(str, "&", retval, TOK_AND_SYMBOL);
+  CHECK_TOK_MACRO(str, "-", retval, TOK_MINUS_SIGN);
+  CHECK_TOK_MACRO(str, "+", retval, TOK_PLUS_SIGN);
+  CHECK_TOK_MACRO(str, "<", retval, TOK_LESS_THAN_SYMBOL);
+  CHECK_TOK_MACRO(str, ">", retval, TOK_GREATER_THAN_SYMBOL);
 
   return retval;
 }
@@ -39,12 +48,22 @@ lexer_token** lex_tokenize_str(const char* str, unsigned int* len) {
   size_t tokens_str_len = 0;
   char** tokens_str = tokenize_str_raw(str, delims, &tokens_str_len);
 
+  lexer_token** tokens = (lexer_token**) malloc(sizeof(lexer_token) * tokens_str_len);
   for (size_t i = 0; i < tokens_str_len; i++) {
-
+    tokens[i] = (lexer_token*) malloc(sizeof(lexer_token));
+    unsigned int tok = str_to_token(tokens_str[i]);
+    if (tok == TOK_UNKNOWN) {
+      tokens[i]->data = (char*) malloc(strlen(tokens_str[i]) + 1);
+      strcpy(tokens[i]->data, tokens_str[i]);
+    } else {
+      tokens[i]->data = NULL;
+    }
+    tokens[i]->token = tok;
+    *len = i;
   }
 
   for (size_t i = 0; i < tokens_str_len; i++) {
     free(tokens_str[i]);
   } free(tokens_str);
-  return NULL;
+  return tokens;
 }
