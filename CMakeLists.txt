@@ -10,8 +10,14 @@ add_executable(arcsc ${SRC_FILES})
 
 target_compile_options(arcsc PRIVATE
     -I/usr/local/include/
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Release>:-O2 -mtune=native -march=x86-64-v2>
+    -Wall
+    -Wno-unused-parameter
+    $<$<CONFIG:Debug>:-g >
+    $<$<CONFIG:Release>:-O2 -mtune=goldmont -march=x86-64-v2 -fstack-protector-all -Werror -flto>
+)
+
+target_link_options(arcsc PRIVATE
+    $<$<CONFIG:Release>:-flto -Wl,-O2, -Wl,-z,relro>
 )
 
 target_link_libraries(arcsc PRIVATE libffi.so)

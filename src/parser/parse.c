@@ -6,6 +6,15 @@
 #include "parse_kw.h"
 #include <string.h>
 
+#define PKW_CALL(kw, i, lex_tokens, lex_len, bcode, func, emsg, called) \
+    if (strcmp(lex_tokens[*i]->data, kw) == 0) { \
+      called = true;  \
+      if (!func(i, lex_tokens, lex_len, bcode)) { \
+        fprintf(stderr, emsg);  \
+        return NULL; \
+      } \
+    }
+
 static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len) {
   // lex_tokens[*i]->token is already TOK_UNKNOWN
   // no need to check
@@ -13,13 +22,30 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
     return NULL;
 
   parsed_bytecode* bcode = (parsed_bytecode*) malloc(sizeof(parsed_bytecode));
-  bcode->kw_inst = (uint16_t**) malloc(sizeof(uint16_t*) * KW_INARR_STD_SIZE);
-  bcode->kw_word = (char**) malloc(sizeof(char*) * KW_INARR_STD_SIZE);
+  bcode->kw_inst = (uint16_t**) malloc(sizeof(uint16_t*) * 6);
+  bcode->kw_word = (char**) malloc(sizeof(char*) * 6);
+  bcode->kw_len = 0;
+  bcode->kw_cap = 6;
+
+  bool called = false;
 
   if (strcmp(lex_tokens[*i]->data, "mov") == 0 || strcmp(lex_tokens[*i]->data, "mv") == 0 || strcmp(lex_tokens[*i]->data, "move") == 0) {
+    called = true;
     if (!pkw_mov(i, lex_tokens, lex_len, bcode)) {
       fprintf(stderr, "[ERR] unable to parse kw_mov\n");
-      return false;
+      return NULL;
+    }
+  }
+
+  // performance is be lowerd because of this
+  PKW_CALL("section", i, lex_tokens, lex_len, bcode, pkw_section, "[ERR] unable to parse kw_section\n", called);
+  PKW_CALL("end", i, lex_tokens, lex_len, bcode, pkw_end, "[ERR unable to parse kw_end\n", called);
+
+  // else
+  if (!called) {
+    if (!pkw_generic(i, lex_tokens, lex_len, bcode)) {
+      fprintf(stderr, "[ERR] Unknown Keyword %s\n", lex_tokens[*i]->data);
+      return NULL;
     }
   }
 
@@ -59,7 +85,7 @@ parsed_bytecode** parse_lexer_tokens(lexer_token** lex_tokens, unsigned int* lex
 
 void free_parse_bytecode(parsed_bytecode** bytecode, size_t* len) {
   for (size_t i = 0; i < *len; i++) {
-    for (size_t j = 0; i < bytecode[i]->kw_len; j++) {
+    for (size_t j = 0; j < bytecode[i]->kw_len; j++) {
       if (bytecode[i]->kw_inst[j] != NULL)
         free(bytecode[i]->kw_inst[j]);
       if (bytecode[i]->kw_word[j] != NULL)

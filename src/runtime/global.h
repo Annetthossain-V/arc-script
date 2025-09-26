@@ -25,15 +25,20 @@ struct _RegisterX32 {
 
 
 // init & deinit
-extern void global_func_init();
-extern void global_func_deinit();
+void global_func_init();
+void global_func_deinit();
+void register_init();
+void register_deinit();
+
 
 static inline void runtime_global_init() {
   global_func_init();
+  register_init();
 }
 
 static inline void runtime_global_deinit() {
   global_func_deinit();
+  register_deinit();
 }
 
 // func.c
@@ -47,3 +52,10 @@ extern char* CURRENT_SCOPE;
 #define SCOPE_SECTION_RODATA 2
 #define SCOPE_SECTION_TEXT 3
 #define SCOPE_TEXT_FUNC 4
+
+// register.c
+bool set_register();
+bool get_register();
+bool push_stack();
+bool pop_stack();
+bool move_stack();
