@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include "cmdline.h"
 #include "parser/lexer.h"
+#include "parser/parse.h"
 #include "runtime/global.h"
 
 char* load_file_mem(char* name) {
@@ -46,8 +47,23 @@ int main(int argc, char** argv) {
 
       unsigned int lex_tokens_len = 0;
       lexer_token** lex_tokens = lex_tokenize_str(file_buf, &lex_tokens_len);
+      if (lex_tokens == NULL) {
+        fprintf(stderr, "[ERR] Unable to tokenize!\n");
+        return EXIT_FAILURE;
+      }
+
+      size_t parse_len = 0;
+      parsed_bytecode** bytecode = parse_lexer_tokens(lex_tokens, &lex_tokens_len, &parse_len);
 
       close_lexer_token(lex_tokens, lex_tokens_len);
+      if (bytecode == NULL) {
+        fprintf(stderr, "[ERR] Unable to parse tokens!\n");
+        return EXIT_FAILURE;
+      }
+
+
+
+      free_parse_bytecode(bytecode, &parse_len);
       free(file_buf);
     }
   }

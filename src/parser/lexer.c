@@ -39,12 +39,13 @@ static unsigned int str_to_token(char* str) {
   CHECK_TOK_MACRO(str, "+", retval, TOK_PLUS_SIGN);
   CHECK_TOK_MACRO(str, "<", retval, TOK_LESS_THAN_SYMBOL);
   CHECK_TOK_MACRO(str, ">", retval, TOK_GREATER_THAN_SYMBOL);
+  CHECK_TOK_MACRO(str, ",", retval, TOK_COMMA);
 
   return retval;
 }
 
 lexer_token** lex_tokenize_str(const char* str, unsigned int* len) {
-  char* delims = " []{}()$@:;*&-+<>";
+  char* delims = " []{}()$@:;*&-+<>,";
   size_t tokens_str_len = 0;
   char** tokens_str = tokenize_str_raw(str, delims, &tokens_str_len);
 

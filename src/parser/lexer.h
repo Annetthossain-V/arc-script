@@ -11,7 +11,7 @@ struct _lexer_token {
 
 lexer_token** lex_tokenize_str(const char* str, unsigned int* len);
 void close_lexer_token(lexer_token** lex, unsigned int len);
-// []{}()$@:;*&-+<>
+// []{}()$@:;*&-+<>,
 #define TOK_UNKNOWN 1
 #define TOK_SQUARE_BRACKET_OPEN 2
 #define TOK_SQUARE_BRACKET_CLOSE 3
@@ -29,3 +29,4 @@ void close_lexer_token(lexer_token** lex, unsigned int len);
 #define TOK_PLUS_SIGN 15
 #define TOK_LESS_THAN_SYMBOL 16
 #define TOK_GREATER_THAN_SYMBOL 17
+#define TOK_COMMA 18
