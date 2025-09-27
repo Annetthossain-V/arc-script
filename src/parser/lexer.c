@@ -23,8 +23,8 @@ static unsigned int str_to_token(char* str) {
   // making it check for every token
   // slowing it down
   // also we could just do str[0] == instead
-  CHECK_TOK_MACRO(str, "]", retval, TOK_SQUARE_BRACKET_OPEN);
-  CHECK_TOK_MACRO(str, "[", retval, TOK_SQUARE_BRACKET_CLOSE);
+  CHECK_TOK_MACRO(str, "[", retval, TOK_SQUARE_BRACKET_OPEN);
+  CHECK_TOK_MACRO(str, "]", retval, TOK_SQUARE_BRACKET_CLOSE);
   CHECK_TOK_MACRO(str, "{", retval, TOK_CURLY_BRACKETS_OPEN);
   CHECK_TOK_MACRO(str, "}", retval, TOK_CURLY_BRACKETS_CLOSE);
   CHECK_TOK_MACRO(str, "(", retval, TOK_BRACKETS_OPEN);

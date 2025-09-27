@@ -1,6 +1,7 @@
 #pragma once
 #include "global/types.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct _Keys2 {
   void** k1;
