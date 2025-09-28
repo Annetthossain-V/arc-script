@@ -1,0 +1,4 @@
+Known Bugs:
+ [Parser]
+  * too many insts or words override earliers ones
+    buffer overflow possibly. (added patch)

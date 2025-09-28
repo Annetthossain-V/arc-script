@@ -8,6 +8,7 @@
 #include "parser/lexer.h"
 #include "parser/parse.h"
 #include "runtime/global.h"
+#include "vm/code.h"
 
 char* load_file_mem(char* name) {
   FILE* fp = fopen(name, "rb");
@@ -35,6 +36,8 @@ int main(int argc, char** argv) {
 
   runtime_global_init();
 
+  // instead of creating new bytecodes and running and deleting for each file
+  // make parse all the files and merge the bytecodes
   bool can_file = false;
   for (uint16_t i = 0; i < args_len; i++) {
     if (args[i]->value == CMD_VALUE_FILE) {
@@ -61,7 +64,7 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
       }
 
-
+      dummy_dbg(bytecode, (int)parse_len);
 
       free_parse_bytecode(bytecode, &parse_len);
       free(file_buf);

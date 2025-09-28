@@ -7,6 +7,13 @@
 #include <string.h>
 
 #define PKW_CALL(kw, i, lex_tokens, lex_len, bcode, func, emsg, called) \
+    if (*i > *lex_len) { \
+      return bcode;  \
+    } \
+    if (lex_tokens[*i]->data == NULL) { \
+      fprintf(stderr, "[ERR] kw NULL\n"); \
+      return NULL;  \
+    } \
     if (strcmp(lex_tokens[*i]->data, kw) == 0) { \
       called = true;  \
       if (!func(i, lex_tokens, lex_len, bcode)) { \
@@ -22,10 +29,10 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
     return NULL;
 
   parsed_bytecode* bcode = (parsed_bytecode*) malloc(sizeof(parsed_bytecode));
-  bcode->kw_inst = (uint16_t**) malloc(sizeof(uint16_t*) * 6);
-  bcode->kw_word = (char**) malloc(sizeof(char*) * 6);
+  bcode->kw_inst = (uint16_t**) malloc(sizeof(uint16_t*) * 16);
+  bcode->kw_word = (char**) malloc(sizeof(char*) * 16);
   bcode->kw_len = 0;
-  bcode->kw_cap = 6;
+  bcode->kw_cap = 16;
 
   bool called = false;
 
@@ -40,6 +47,7 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
   // performance is be lowerd because of this
   PKW_CALL("section", i, lex_tokens, lex_len, bcode, pkw_section, "[ERR] unable to parse kw_section\n", called);
   PKW_CALL("end", i, lex_tokens, lex_len, bcode, pkw_end, "[ERR unable to parse kw_end\n", called);
+  PKW_CALL("func", i, lex_tokens, lex_len, bcode, pkw_func, "[ERR] unable to parse kw_func\n", called);
 
   // else
   if (!called) {
@@ -52,12 +60,12 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
   return bcode;
 }
 
-static void append_bytecode(parsed_bytecode** bytecode, parsed_bytecode* appendi, unsigned int* cap, size_t len) {
+static void append_bytecode(parsed_bytecode*** bytecode, parsed_bytecode* appendi, unsigned int* cap, size_t len) {
   if (len - 2 == *cap) {
-    bytecode = (parsed_bytecode**) realloc(*bytecode, sizeof(parsed_bytecode) * (*cap + 16));
+    *bytecode = (parsed_bytecode**) realloc(*bytecode, sizeof(parsed_bytecode) * (*cap + 16));
     *cap += 16;
   }
-  bytecode[len] = appendi;
+  *bytecode[len] = appendi;
 }
 
 parsed_bytecode** parse_lexer_tokens(lexer_token** lex_tokens, unsigned int* lex_len, size_t* len) {
@@ -76,7 +84,7 @@ parsed_bytecode** parse_lexer_tokens(lexer_token** lex_tokens, unsigned int* lex
       return NULL;
     }
 
-    append_bytecode(bytecode, bcode, &bytecode_cap, *len);
+    append_bytecode(&bytecode, bcode, &bytecode_cap, *len);
     (*len)++;
   }
 
