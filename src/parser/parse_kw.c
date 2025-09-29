@@ -71,6 +71,35 @@ bool pkw_section(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_le
   return true;
 }
 
-bool pkw_end(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) { return false; }
+bool pkw_end(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) {
+  bcode->kw_inst[bcode->kw_len] = (uint16_t*) malloc(sizeof(uint16_t));
+  *bcode->kw_inst[bcode->kw_len] = PKW_END;
+  bcode->kw_word[bcode->kw_len] = NULL;
+  bcode->kw_len++;
 
-bool pkw_func(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) { return false; }
+  return true;
+}
+
+bool pkw_func(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode, size_t bcode_len) {
+  *i += 1;
+  if (*i > *lex_len) {
+    fprintf(stderr, "[ERR] func out of bound\n");
+    return false;
+  }
+
+  if (lex_tokens[*i]->data == NULL) {
+    fprintf(stderr, "[ERR] func name not found!\n");
+    return false;
+  }
+
+  bcode->kw_inst[bcode->kw_len] = (uint16_t*) malloc(sizeof(uint16_t));
+  *bcode->kw_inst[bcode->kw_len] = PKW_FUNC;
+  bcode->kw_word[bcode->kw_len] = (char*) malloc(strlen(lex_tokens[*i]->data) + 1);
+  strcpy(bcode->kw_word[bcode->kw_len], lex_tokens[*i]->data);
+  bcode->kw_len++;
+
+  // env insert
+
+
+  return true;
+}

@@ -22,7 +22,7 @@
       } \
     }
 
-static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len) {
+static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, size_t bcode_len) {
   // lex_tokens[*i]->token is already TOK_UNKNOWN
   // no need to check
   if (lex_tokens[*i]->data == NULL)
@@ -37,6 +37,13 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
   bool called = false;
 
   if (strcmp(lex_tokens[*i]->data, "mov") == 0 || strcmp(lex_tokens[*i]->data, "mv") == 0 || strcmp(lex_tokens[*i]->data, "move") == 0) {
+    if (*i > *lex_len) {
+      return bcode;
+    }
+    if (lex_tokens[*i]->data == NULL) {
+      fprintf(stderr, "[ERR] kw NULL\n");
+      return NULL;
+    }
     called = true;
     if (!pkw_mov(i, lex_tokens, lex_len, bcode)) {
       fprintf(stderr, "[ERR] unable to parse kw_mov\n");
@@ -47,7 +54,19 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
   // performance is be lowerd because of this
   PKW_CALL("section", i, lex_tokens, lex_len, bcode, pkw_section, "[ERR] unable to parse kw_section\n", called);
   PKW_CALL("end", i, lex_tokens, lex_len, bcode, pkw_end, "[ERR unable to parse kw_end\n", called);
-  PKW_CALL("func", i, lex_tokens, lex_len, bcode, pkw_func, "[ERR] unable to parse kw_func\n", called);
+
+  if (strcmp(lex_tokens[*i]->data, "func") == 0)  {
+    if (*i > *lex_len) {
+      return bcode;
+    }
+    if (lex_tokens[*i]->data == NULL) {
+      fprintf(stderr, "[ERR] kw NULL\n");
+      return NULL;
+    }
+    called = true;
+    if (!pkw_func(i, lex_tokens, lex_len, bcode, bcode_len))
+      return NULL;
+  }
 
   // else
   if (!called) {
@@ -61,16 +80,17 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
 }
 
 static void append_bytecode(parsed_bytecode*** bytecode, parsed_bytecode* appendi, unsigned int* cap, size_t len) {
-  if (len - 2 == *cap) {
-    *bytecode = (parsed_bytecode**) realloc(*bytecode, sizeof(parsed_bytecode) * (*cap + 16));
+  if (len >= *cap) {
+    *bytecode = (parsed_bytecode**) realloc(*bytecode, sizeof(parsed_bytecode*) * (*cap + 16));
     *cap += 16;
   }
-  *bytecode[len] = appendi;
+  (*bytecode)[len] = appendi;
 }
 
 parsed_bytecode** parse_lexer_tokens(lexer_token** lex_tokens, unsigned int* lex_len, size_t* len) {
   parsed_bytecode** bytecode = (parsed_bytecode**) malloc(sizeof(parsed_bytecode*) * 16);
   unsigned int bytecode_cap = 16;
+  *len = 0;
 
   for (unsigned int i = 0; i < *lex_len; i++) {
     if (lex_tokens[i]->token != TOK_UNKNOWN) {
@@ -78,7 +98,7 @@ parsed_bytecode** parse_lexer_tokens(lexer_token** lex_tokens, unsigned int* lex
       return NULL;
     }
 
-    parsed_bytecode* bcode = parse_keyword_handler(&i, lex_tokens, lex_len);
+    parsed_bytecode* bcode = parse_keyword_handler(&i, lex_tokens, lex_len, *len);
     if (bcode == NULL) {
       fprintf(stderr, "[ERR] [Parser.c] Unable to find keyword!\n");
       return NULL;
