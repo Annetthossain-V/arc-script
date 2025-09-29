@@ -1,16 +1,20 @@
 #include "../global.h"
+#include <stdint.h>
 #include <pthread.h>
 
 static pthread_mutex_t REGIST_MUTEX;
 
 static register** G_REGISTERS;
+static uint32_t G_REG_SIZE;
 
 static register** G_STACK;
+static uint32_t G_STK_LEN;
+static uint32_t G_STK_CAP;
 
 void register_init() {
-
+  pthread_mutex_init(&REGIST_MUTEX, NULL);
 }
 
 void register_deinit() {
-
+  pthread_mutex_destroy(&REGIST_MUTEX);
 }

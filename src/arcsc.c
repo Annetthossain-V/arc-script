@@ -19,7 +19,7 @@ char* load_file_mem(char* name) {
   long size = ftell(fp);
   fseek(fp, 0, SEEK_SET);
 
-  char* buf = (char*)malloc(size + 1);
+  char* buf = (char*)malloc(size + 3);
   fread(buf, sizeof(char), size, fp);
   buf[size + 1] = '\0';
 
@@ -82,19 +82,21 @@ int main(int argc, char** argv) {
     }
   }
 
+  for (size_t i = 0; i < arr_len; i++) {
+    close_lexer_token(lex_tokens_arr[i], *lex_len[i]);
+    free_parse_bytecode(bytecodes_arr[i], bcode_len[i]);
+    free(lex_tokens_arr[i]);
+    free(bytecodes_arr[i]);
+  }
+  free(lex_tokens_arr);
+  free(bytecodes_arr);
+
   for(uint16_t i = 0; i < file_len; i++) {
     free(lex_len[i]);
     free(bcode_len[i]);
   }
   free(lex_len);
   free(bcode_len);
-
-  for (size_t i = 0; i < arr_len; i++) {
-    free(lex_tokens_arr[i]);
-    free(bytecodes_arr[i]);
-  }
-  free(lex_tokens_arr);
-  free(bytecodes_arr);
 
   close_args(args, &args_len);
   runtime_global_deinit();

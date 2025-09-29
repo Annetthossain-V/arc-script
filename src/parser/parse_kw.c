@@ -1,6 +1,7 @@
 #include "parse.h"
 #include "parse_kw.h"
 #include "lexer.h"
+#include "../runtime/global.h"
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -99,7 +100,7 @@ bool pkw_func(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, 
   bcode->kw_len++;
 
   // env insert
-  puts("func");
+  global_func_insert(bcode->kw_word[bcode->kw_len - 1], (uint32_t)bcode_len);
 
   return true;
 }
