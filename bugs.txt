@@ -2,3 +2,7 @@ Known Bugs:
  [Parser]
   * too many insts or words override earliers ones
     buffer overflow possibly. (added patch)
+ [Parser::Mov]
+  * after mov it returns bytecode and ignores other insts (added patch)
+ [Parse:pi2p]
+ * instruction cannot handle negative values (patch pending)

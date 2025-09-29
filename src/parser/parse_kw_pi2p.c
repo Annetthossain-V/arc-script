@@ -27,7 +27,9 @@ bool _pkw_i2_parse(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_
   // unsigned int bindex = 1;
   bool expecting_comma = false;
   unsigned char input_count = 0;
+  bool semi = false;
 
+  // if ; is not present this loops until everything ends
   for (j = 0; j < (*lex_len - *i) + 1; j++) {
     if (bcode->kw_cap <= bcode->kw_len)
       inc_bcode_cap(bcode);
@@ -108,12 +110,17 @@ bool _pkw_i2_parse(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_
       if (input_count == 1)
         expecting_comma = true;
     }
-    else if (lex_tokens[*i + j]->token == TOK_SEMI_COLON) { break; }
+    else if (lex_tokens[*i + j]->token == TOK_SEMI_COLON) { semi = true; break; }
     else if (expecting_comma && lex_tokens[*i + j]->token == TOK_COMMA) { continue; }
     else {
       fprintf(stderr, "[ERR] [_pkw_i2_parse] unknown token! j%u token %d\n", j, lex_tokens[*i + j]->token);
       return false;
     }
+  }
+
+  if (!semi) {
+    fprintf(stderr, "[ERR] missed a semi-colon!\n");
+    return false;
   }
 
   *i += j;

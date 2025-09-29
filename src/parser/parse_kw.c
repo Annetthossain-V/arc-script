@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-bool pkw_mov(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) {
+bool pkw_mov(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode, size_t bcode_len) {
   if (*i + 1 >= *lex_len) {
     fprintf(stderr, "[ERR] Mov out of bound\n");
     return false;
@@ -35,7 +35,7 @@ bool pkw_mov(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, p
   return true;
 }
 
-bool pkw_section(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) {
+bool pkw_section(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode, size_t bcode_len) {
   if (*i + 1 >= *lex_len) {
     fprintf(stderr, "[ERR] section out of bound\n");
     return false;
@@ -71,7 +71,7 @@ bool pkw_section(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_le
   return true;
 }
 
-bool pkw_end(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) {
+bool pkw_end(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode, size_t bcode_len) {
   bcode->kw_inst[bcode->kw_len] = (uint16_t*) malloc(sizeof(uint16_t));
   *bcode->kw_inst[bcode->kw_len] = PKW_END;
   bcode->kw_word[bcode->kw_len] = NULL;
@@ -99,7 +99,7 @@ bool pkw_func(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, 
   bcode->kw_len++;
 
   // env insert
-
+  puts("func");
 
   return true;
 }

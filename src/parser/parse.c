@@ -6,17 +6,16 @@
 #include "parse_kw.h"
 #include <string.h>
 
-#define PKW_CALL(kw, i, lex_tokens, lex_len, bcode, func, emsg, called) \
+#define PKW_CALL(kw, i, lex_tokens, lex_len, bcode, func, emsg, called, bcode_len) \
     if (*i > *lex_len) { \
       return bcode;  \
     } \
     if (lex_tokens[*i]->data == NULL) { \
-      fprintf(stderr, "[ERR] kw NULL\n"); \
-      return NULL;  \
+      return bcode;  \
     } \
     if (strcmp(lex_tokens[*i]->data, kw) == 0) { \
       called = true;  \
-      if (!func(i, lex_tokens, lex_len, bcode)) { \
+      if (!func(i, lex_tokens, lex_len, bcode, bcode_len)) { \
         fprintf(stderr, emsg);  \
         return NULL; \
       } \
@@ -45,32 +44,20 @@ static parsed_bytecode* parse_keyword_handler(unsigned int* i, lexer_token** lex
       return NULL;
     }
     called = true;
-    if (!pkw_mov(i, lex_tokens, lex_len, bcode)) {
+    if (!pkw_mov(i, lex_tokens, lex_len, bcode, bcode_len)) {
       fprintf(stderr, "[ERR] unable to parse kw_mov\n");
       return NULL;
     }
   }
 
   // performance is be lowerd because of this
-  PKW_CALL("section", i, lex_tokens, lex_len, bcode, pkw_section, "[ERR] unable to parse kw_section\n", called);
-  PKW_CALL("end", i, lex_tokens, lex_len, bcode, pkw_end, "[ERR unable to parse kw_end\n", called);
-
-  if (strcmp(lex_tokens[*i]->data, "func") == 0)  {
-    if (*i > *lex_len) {
-      return bcode;
-    }
-    if (lex_tokens[*i]->data == NULL) {
-      fprintf(stderr, "[ERR] kw NULL\n");
-      return NULL;
-    }
-    called = true;
-    if (!pkw_func(i, lex_tokens, lex_len, bcode, bcode_len))
-      return NULL;
-  }
+  PKW_CALL("section", i, lex_tokens, lex_len, bcode, pkw_section, "[ERR] unable to parse kw_section\n", called, bcode_len);
+  PKW_CALL("end", i, lex_tokens, lex_len, bcode, pkw_end, "[ERR] unable to parse kw_end\n", called, bcode_len);
+  PKW_CALL("func", i, lex_tokens, lex_len, bcode, pkw_func, "[ERR] unable to parse kw_func\n", called, bcode_len);
 
   // else
   if (!called) {
-    if (!pkw_generic(i, lex_tokens, lex_len, bcode)) {
+    if (!pkw_generic(i, lex_tokens, lex_len, bcode, bcode_len)) {
       fprintf(stderr, "[ERR] Unknown Keyword %s\n", lex_tokens[*i]->data);
       return NULL;
     }
