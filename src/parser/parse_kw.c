@@ -36,8 +36,39 @@ bool pkw_mov(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, p
 }
 
 bool pkw_section(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) {
+  if (*i + 1 >= *lex_len) {
+    fprintf(stderr, "[ERR] section out of bound\n");
+    return false;
+  }
 
-  return false;
+  bcode->kw_word[bcode->kw_len] = NULL;
+  bcode->kw_inst[bcode->kw_len] = (uint16_t*) malloc(sizeof(uint16_t));
+  *bcode->kw_inst[bcode->kw_len] = PKW_SECTION;
+  bcode->kw_len++;
+
+  *i += 1;
+
+  bcode->kw_inst[bcode->kw_len] = (uint16_t*) malloc(sizeof(uint16_t));
+  bcode->kw_word[bcode->kw_len] = NULL;
+
+  if (lex_tokens[*i]->data == NULL) {
+    fprintf(stderr, "[ERR] Expected section name!\n");
+    return false;
+  }
+
+  if (strcmp(lex_tokens[*i]->data, "text") == 0)
+    *bcode->kw_inst[bcode->kw_len] = PKW_O2_SECT_TEXT;
+  else if (strcmp(lex_tokens[*i]->data, "data") == 0)
+    *bcode->kw_inst[bcode->kw_len] = PKW_O2_SECT_DATA;
+  else if (strcmp(lex_tokens[*i]->data, "rodata") == 0)
+    *bcode->kw_inst[bcode->kw_len] = PKW_O2_SECT_RODATA;
+  else {
+    fprintf(stderr, "[ERR] Unknown Section ID: %s\n", lex_tokens[*i]->data);
+    return false;
+  }
+
+  bcode->kw_len++;
+  return true;
 }
 
 bool pkw_end(unsigned int* i, lexer_token** lex_tokens, unsigned int* lex_len, parsed_bytecode* bcode) { return false; }

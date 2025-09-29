@@ -9,5 +9,5 @@ struct _cmdline_values {
 
 #define CMD_VALUE_FILE 1
 
-cmdline_value** handle_args(int argc, char** argv, uint16_t* len);
+cmdline_value** handle_args(int argc, char** argv, uint16_t* len, uint16_t* file_len);
 void close_args(cmdline_value** args, uint16_t* len);

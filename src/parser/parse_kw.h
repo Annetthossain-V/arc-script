@@ -13,6 +13,12 @@
 #define PKW_PI2P_MODE 7
 #define PKW_PI2P_DEREF_END 8
 
+// special codes {O2}
+#define PKW_O2_NAME 1
+#define PKW_O2_SECT_TEXT 2
+#define PKW_O2_SECT_DATA 3
+#define PKW_O2_SECT_RODATA 4
+
 // opcodes
 #define PKW_MOV 1
 #define PKW_SECTION 2

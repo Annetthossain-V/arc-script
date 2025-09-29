@@ -13,7 +13,7 @@ void close_args(cmdline_value **args, uint16_t* len) {
   *len = 0;
 }
 
-cmdline_value** handle_args(int argc, char** argv, uint16_t* len) {
+cmdline_value** handle_args(int argc, char** argv, uint16_t* len, uint16_t* file_len) {
   cmdline_value** args = (cmdline_value**)malloc(sizeof(cmdline_value) * (argc - 1) + 1);
   for (int i = 1; i < argc; i++) {
     if (strlen(argv[i]) > 255)
@@ -26,6 +26,7 @@ cmdline_value** handle_args(int argc, char** argv, uint16_t* len) {
     } else {
       strcpy(arg->str, argv[i]);
       arg->value = CMD_VALUE_FILE;
+      *file_len += 1;
     }
     *len = i;
   }

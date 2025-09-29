@@ -7,6 +7,10 @@ static register** G_REGISTERS;
 
 static register** G_STACK;
 
-void register_init() {}
+void register_init() {
 
-void register_deinit() {}
+}
+
+void register_deinit() {
+
+}
