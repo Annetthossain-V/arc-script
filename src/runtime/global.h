@@ -27,13 +27,15 @@ static inline void runtime_global_deinit() {
 
 // func.c
 void global_func_insert(char* name, uint32_t index);
-void global_func_remove(uint32_t index);
-void global_func_find(char* name);
+void global_func_remove(char* name);
+int32_t global_func_find(char* name, uint32_t* i);
 
 // env.c
-void add_scope();
+void add_scope(uint8_t scope);
 void pop_scope();
-void current_scope();
+uint8_t current_scope();
+void set_current_section(uint8_t section);
+uint8_t get_current_section();
 
 // register.c
 bool set_register();

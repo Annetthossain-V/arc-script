@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 static pthread_mutex_t GLOBAL_FUNC_MUTEX;
 
@@ -36,6 +37,8 @@ void global_func_deinit() {
 }
 
 void global_func_insert(char* name, uint32_t index) {
+  pthread_mutex_lock(&GLOBAL_FUNC_MUTEX);
+
   if (FUNC_TABLE_LEN >= FUNC_TABLE_CAP)
     grow_table();
 
@@ -48,12 +51,42 @@ void global_func_insert(char* name, uint32_t index) {
   *(uint32_t*)FUNC_TABLE[FUNC_TABLE_LEN]->id2 = index;
 
   FUNC_TABLE_LEN++;
+  pthread_mutex_unlock(&GLOBAL_FUNC_MUTEX);
 }
 
-void global_func_remove(uint32_t index) {
+void global_func_remove(char* name) {
+  pthread_mutex_lock(&GLOBAL_FUNC_MUTEX);
 
+  uint32_t i = 0;
+  int32_t func_index = global_func_find(name, &i);
+  if (func_index == -1) {
+    fprintf(stderr, "[WARN] remove function doesn't exist\n");
+    return;
+  }
+
+  free(FUNC_TABLE[i]->id1);
+  free(FUNC_TABLE[i]->id2);
+  free(FUNC_TABLE[i]);
+
+  arr_shift_left((void**)FUNC_TABLE, FUNC_TABLE_LEN, i);
+  FUNC_TABLE_LEN--;
+
+  pthread_mutex_unlock(&GLOBAL_FUNC_MUTEX);
 }
 
-void global_func_find(char* name) {
+int32_t global_func_find(char* name, uint32_t* ii) {
+  pthread_mutex_lock(&GLOBAL_FUNC_MUTEX);
 
+  for (uint32_t i = 0; i < FUNC_TABLE_LEN; i++) {
+    if (FUNC_TABLE[i]->id1 != NULL && strcmp(FUNC_TABLE[i]->id1, name) == 0) {
+      if (ii != NULL)
+        *ii = i;
+
+      pthread_mutex_unlock(&GLOBAL_FUNC_MUTEX);
+      return (int32_t) *(uint32_t*)FUNC_TABLE[i]->id2;
+    }
+  }
+
+  pthread_mutex_unlock(&GLOBAL_FUNC_MUTEX);
+  return -1;
 }

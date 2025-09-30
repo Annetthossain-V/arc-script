@@ -4,12 +4,12 @@
 
 static pthread_mutex_t REGIST_MUTEX;
 
-static register** G_REGISTERS;
-static uint32_t G_REG_SIZE;
+static register** REGISTERS;
+static uint32_t REG_SIZE;
 
-static register** G_STACK;
-static uint32_t G_STK_LEN;
-static uint32_t G_STK_CAP;
+static register** STACK;
+static uint32_t STK_LEN;
+static uint32_t STK_CAP;
 
 void register_init() {
   pthread_mutex_init(&REGIST_MUTEX, NULL);
